@@ -60,9 +60,20 @@ func LoadAPIRoutes(r *gin.Engine, db *gorm.DB) {
 	public.POST("/forgot_password", userHandler.ForgotPassword)
 	private.GET("/me", userHandler.GetUserInfo)
 
+	//manage group
+	groupHandler := h.NewGroupHandler(db)
+	private.GET("/groups", groupHandler.Index)
+	private.POST("/group", groupHandler.Create)
+
+	//manage group members
+	groupMemberHandler := h.NewGroupMemberHandler(db)
+	private.GET("/members", groupMemberHandler.Index)
+	private.POST("/add_member", groupMemberHandler.Create)
+	private.POST("/remove_member", groupMemberHandler.Delete)
+
 	var port = os.Getenv("PORT")
 	if port == "" {
-		port = "9000"
+		port = "7000"
 	}
 	r.Run(fmt.Sprintf(":%s", port))
 }
@@ -79,8 +90,10 @@ func InitDB() *gorm.DB {
 		panic(fmt.Sprintf("Error connecting to the database:  %s", err))
 	}
 	_db.DB()
-	//_db.LogMode(true)
-	_db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&m.User{})
+	_db.LogMode(true)
+	_db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&m.User{},
+																&m.Group{},
+																&m.GroupMember{})
 	log.Printf("must create tables")
 	return _db
 }

@@ -46,3 +46,14 @@ func (handler GroupHandler) Create(c *gin.Context) {
 		respond(http.StatusBadRequest, err.Error(), c, true)
 	}
 }
+
+//search for group
+func (handler GroupHandler) Search(c *gin.Context) {
+	groups := []m.Group{}		
+	res := handler.db.Preload("Members").Preload("Members.User").Where("name LIKE ?", "%"+ c.Param("group_name") +"%").Find(&groups)
+	if res.RowsAffected > 0 {
+		c.JSON(http.StatusOK, groups)	
+	} else {
+		respond(http.StatusNotFound, "No records found.", c, true)
+	}
+}

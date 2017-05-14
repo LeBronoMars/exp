@@ -64,6 +64,7 @@ func LoadAPIRoutes(r *gin.Engine, db *gorm.DB) {
 	groupHandler := h.NewGroupHandler(db)
 	private.GET("/groups", groupHandler.Index)
 	private.POST("/group", groupHandler.Create)
+	private.GET("/groups/search/:group_name", groupHandler.Search)
 
 	//manage group members
 	groupMemberHandler := h.NewGroupMemberHandler(db)
